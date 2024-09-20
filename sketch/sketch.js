@@ -8,7 +8,9 @@
 // https://patrickhlauke.github.io/touch/
 // https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/pressure
 
-// TODO implement undo/redo
+// done - keep also pressure
+// done - create a redraw function
+// done - implement undo/redo
 // TODO implement minimum distance before new point stored
 
 
@@ -47,15 +49,16 @@ var isPressureInit = false;
 var isDrawing = false;
 var isDrawingJustStarted = false;
 
-const canvasWidth  = 400;
-const canvasHeight = 300;
+const canvasWidth  = 800;
+const canvasHeight = 600;
 const realWidth = 0.4;   // meter
-const realHeight = 0.3;  // meter // TODO should keep aspect ratio of canvas ...
+const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.03; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 
 var points = [];
 var strokes = [];
+var deletedStrokes = [];
 
 function setup() {
     
@@ -72,15 +75,70 @@ function setup() {
   drawCanvas.id("drawingCanvas");
   drawCanvas.position(0, 0);    
   
-    // Create a button and place it beneath the canvas.
-    let button = createButton('Click to save');
-    button.position(0, canvasHeight);
-  
-    // Call repaint() when the button is pressed.
-    button.mousePressed(save2file);
+  let buttonSave = createButton('Click to save');
+  buttonSave.position(0, canvasHeight);
+  buttonSave.mousePressed(save2file);
 
-    rect(2, 2, canvasWidth-4, canvasHeight-4);
+  // let buttonRedraw = createButton('Redraw');
+  // buttonRedraw.position(100, canvasHeight);
+  // buttonRedraw.mousePressed(redrawCanvas);
 
+  let buttonUndo = createButton('Undo');
+  buttonUndo.position(200, canvasHeight);
+  buttonUndo.mousePressed(undo);
+
+  let buttonRedo = createButton('Redo');
+  buttonRedo.position(250, canvasHeight);
+  buttonRedo.mousePressed(redo);
+
+  rect(2, 2, canvasWidth-4, canvasHeight-4);
+}
+
+function redrawCanvas() { 
+  print("in redrawCanvas"); 
+  fill(255);
+  rect(2, 2, canvasWidth-4, canvasHeight-4);
+  fill(100,0,0);
+  for (let i = 0; i < strokes.length; i = i + 1) {
+    pts = strokes[i];
+    prevPenX = pts[0][0];
+    prevPenY = pts[0][1];
+    prevBrushSize =  minBrushSize + (pts[0][2] * pressureMultiplier);
+    for (let j = 0; j < pts.length; j = j + 1) {
+      p = pts[j];
+      penX = p[0];
+      penY = p[1];
+      pressure = p[2];
+      brushSize = minBrushSize + (pressure * pressureMultiplier);
+
+      drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize);
+
+      // Save the latest brush values for next frame
+      prevBrushSize = brushSize;
+      prevPenX = penX;
+      prevPenY = penY;
+
+      ellipse(penX, penY, brushSize);
+    }
+  }
+}
+
+function undo() {
+  print("in undo");
+  if (strokes.length > 0) {
+    deleted = strokes.pop();
+    deletedStrokes.push(deleted);
+    redrawCanvas();
+  }
+}
+
+function redo() {
+  print("in redo");
+  if (deletedStrokes.length > 0) {
+    last = deletedStrokes.pop();
+    strokes.push(last);
+    redrawCanvas();
+  }
 }
 
 function save2file() {
@@ -101,21 +159,21 @@ function save2file() {
   
   // write strokes
   for (let i = 0; i < strokes.length; i = i + 1) {
-    points = strokes[i];
+    pts = strokes[i];
 
     // move to first point with zUp
-    pCanvas = points[0];
+    pCanvas = pts[0];
     pReal = convert(pCanvas);
     writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
 
-    for (let j = 0; j < points.length; j = j + 1) {
-      pCanvas = points[j];
+    for (let j = 0; j < pts.length; j = j + 1) {
+      pCanvas = pts[j];
       pReal = convert(pCanvas);
       writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zDown},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
     }
 
     // move to last point with zUp
-    pCanvas = points[points.length-1];
+    pCanvas = pts[pts.length-1];
     pReal = convert(pCanvas);
     writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
 
@@ -136,8 +194,7 @@ function draw() {
   if(isPressureInit == false){
     initPressure();
   }
-    
-  
+
   if(isDrawing) {      
     // Smooth out the position of the pointer 
     penX = xFilter.filter(mouseX, millis());
@@ -157,33 +214,11 @@ function draw() {
     brushSize = minBrushSize + (pressure * pressureMultiplier);
 
     // Calculate the distance between previous and current position
-    d = dist(prevPenX, prevPenY, penX, penY);
-
-    // The bigger the distance the more ellipses
-    // will be drawn to fill in the empty space
-    inBetween = (d / min(brushSize,prevBrushSize)) * brushDensity;
-
-    // Add ellipses to fill in the space 
-    // between samples of the pen position
-    for(i=1;i<=inBetween;i++){
-      amt = i/inBetween;
-      s = lerp(prevBrushSize, brushSize, amt);
-      x = lerp(prevPenX, penX, amt);
-      y = lerp(prevPenY, penY, amt);
-      noStroke();
-      fill(100)
-      ellipse(x, y, s);      
-    }
-
-    // Draw an ellipse at the latest position
-    noStroke();
-    fill(100,0,0);
-    ellipse(penX, penY, brushSize);
-    points.push([penX, penY])
-    fill(100);
+    drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize);
+    points.push([penX, penY, pressure]);
 
     // Save the latest brush values for next frame
-    prevBrushSize = brushSize; 
+    prevBrushSize = brushSize;
     prevPenX = penX;
     prevPenY = penY;
     
@@ -194,9 +229,33 @@ function draw() {
       points = [];
     }
   }
-  
 }
 
+function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
+  d = dist(prevPenX, prevPenY, penX, penY);
+
+  // The bigger the distance the more ellipses
+  // will be drawn to fill in the empty space
+  inBetween = (d / min(brushSize, prevBrushSize)) * brushDensity;
+
+  // Add ellipses to fill in the space 
+  // between samples of the pen position
+  for (i = 1; i <= inBetween; i++) {
+    amt = i / inBetween;
+    s = lerp(prevBrushSize, brushSize, amt);
+    x = lerp(prevPenX, penX, amt);
+    y = lerp(prevPenY, penY, amt);
+    noStroke();
+    fill(100);
+    ellipse(x, y, s);
+  }
+
+  // Draw an ellipse at the latest position
+  noStroke();
+  fill(100, 0, 0);
+  ellipse(penX, penY, brushSize);
+  fill(100);
+}
 
 /***********************
 *       UTILITIES      *
