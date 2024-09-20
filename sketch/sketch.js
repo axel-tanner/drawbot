@@ -11,7 +11,9 @@
 // done - keep also pressure
 // done - create a redraw function
 // done - implement undo/redo
-// TODO implement minimum distance before new point stored
+// TODO tune the epsilon parameter for douglas-peucker ...
+// TODO implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
+// TODO get rid of trailing points when mouse is not pressed anymore / maybe try first on tablet
 
 
 /***********************
@@ -56,6 +58,8 @@ const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping a
 const zUp = 0.03; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 
+const epsilon = 3.0;
+
 var points = [];
 var strokes = [];
 var deletedStrokes = [];
@@ -79,9 +83,9 @@ function setup() {
   buttonSave.position(0, canvasHeight);
   buttonSave.mousePressed(save2file);
 
-  // let buttonRedraw = createButton('Redraw');
-  // buttonRedraw.position(100, canvasHeight);
-  // buttonRedraw.mousePressed(redrawCanvas);
+  let buttonRedraw = createButton('Redraw');
+  buttonRedraw.position(100, canvasHeight);
+  buttonRedraw.mousePressed(redrawCanvas);
 
   let buttonUndo = createButton('Undo');
   buttonUndo.position(200, canvasHeight);
@@ -120,6 +124,20 @@ function redrawCanvas() {
 
       ellipse(penX, penY, brushSize);
     }
+
+    // try rdpCalculation
+    // TODO need to keep the respective pressure values too ...
+    ptsXY = [];
+    for (let j = 0; j < pts.length; j = j + 1) {
+      ptsXY.push(createVector(pts[j][0], pts[j][1]));
+    }
+    rdpPoints = rgp(ptsXY, epsilon);
+    for (let j = 0; j < rdpPoints.length; j = j + 1) {
+      noFill();
+      stroke(0, 255, 0);
+      ellipse(rdpPoints[j].x, rdpPoints[j].y, 20);
+    }
+    print(`redraw: orig stroke ${ptsXY.length} vs rdp ${rdpPoints.length}`);
   }
 }
 
@@ -139,6 +157,42 @@ function redo() {
     strokes.push(last);
     redrawCanvas();
   }
+}
+
+function rgp(points = [], epsilon = 0.1) {
+  const p1 = points[0];
+  const p2 = points[points.length - 1];
+  const { index, dist } = furthestPoint(p1, p2, points);
+
+  if (dist > epsilon) {
+    return [...rgp(points.slice(0, index + 1), epsilon), ...rgp(points.slice(index).slice(1), epsilon)];
+  } else {
+    return p1 == p2 ? [p1] : [p1, p2];
+  }
+}
+
+function furthestPoint(p1, p2, points) {
+  let dmax = 0;
+  let maxI = -1;
+  for (let i = 0; i < points.length; i++) {
+    const dtemp = perpendicularDist(points[i], p1, p2);
+
+    if (dtemp > dmax) {
+      dmax = dtemp;
+      maxI = i;
+    }
+  }
+
+  return { index: maxI, dist: dmax };
+}
+
+function perpendicularDist(p, p1, p2) {
+  if (p1 == p || p == p2) return 0;
+  const a = p.copy().sub(p1);
+  const b = p.copy().sub(p2);
+  const c = a.cross(b).mag();
+  const d = p2.copy().sub(p1).mag();
+  return c / d;
 }
 
 function save2file() {
@@ -227,12 +281,16 @@ function draw() {
     if (points.length > 0) {
       strokes.push(points);
       points = [];
+      // clear history of strokes
+      deletedStrokes = [];
     }
   }
 }
 
 function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
   d = dist(prevPenX, prevPenY, penX, penY);
+
+  fill(100, 100, 100, 25);
 
   // The bigger the distance the more ellipses
   // will be drawn to fill in the empty space
@@ -246,7 +304,6 @@ function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
     x = lerp(prevPenX, penX, amt);
     y = lerp(prevPenY, penY, amt);
     noStroke();
-    fill(100);
     ellipse(x, y, s);
   }
 
@@ -254,7 +311,9 @@ function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
   noStroke();
   fill(100, 0, 0);
   ellipse(penX, penY, brushSize);
-  fill(100);
+  stroke(100,0,0);
+  line(prevPenX, prevPenY, penX, penY);
+  noStroke();
 }
 
 /***********************
