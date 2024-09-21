@@ -13,7 +13,8 @@
 // done - implement undo/redo
 // done - tune the epsilon parameter for douglas-peucker ...
 // done - implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
-// TODO get rid of trailing points when mouse is not pressed anymore / maybe try first on tablet
+// TODO - pressure to z value - test
+// TODO - get rid of trailing points when mouse is not pressed anymore / maybe try first on tablet - maybe this is the polyfillSpeedDown value?
 
 
 /***********************
@@ -57,6 +58,7 @@ const realWidth = 0.4;   // meter
 const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.03; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
+const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
 
 const epsilon = 2.0;
 
@@ -247,7 +249,7 @@ function save2file() {
     for (let j = 0; j < pts.length; j = j + 1) {
       pCanvas = pts[j];
       pReal = convert(pCanvas);
-      writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zDown},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
+      writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zDown - pReal[2]*zPressureRange},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
     }
 
     // move to last point with zUp
@@ -347,7 +349,8 @@ function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
 function convert(p) {
   prx = round(p[0] / canvasWidth * realWidth, 5);
   pry = round(p[1] / canvasHeight * realHeight, 5);
-  return [prx, pry];
+  prz = round(p[2], 4); // this is the pressure
+  return [prx, pry. prz];
 }
 
 // Initializing Pressure.js
