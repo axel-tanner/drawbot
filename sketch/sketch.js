@@ -11,8 +11,8 @@
 // done - keep also pressure
 // done - create a redraw function
 // done - implement undo/redo
-// TODO tune the epsilon parameter for douglas-peucker ...
-// TODO implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
+// done - tune the epsilon parameter for douglas-peucker ...
+// done - implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
 // TODO get rid of trailing points when mouse is not pressed anymore / maybe try first on tablet
 
 
@@ -58,7 +58,7 @@ const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping a
 const zUp = 0.03; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 
-const epsilon = 3.0;
+const epsilon = 2.0;
 
 var points = [];
 var strokes = [];
@@ -125,19 +125,16 @@ function redrawCanvas() {
       ellipse(penX, penY, brushSize);
     }
 
-    // try rdpCalculation
-    // TODO need to keep the respective pressure values too ...
-    ptsXY = [];
-    for (let j = 0; j < pts.length; j = j + 1) {
-      ptsXY.push(createVector(pts[j][0], pts[j][1]));
-    }
-    rdpPoints = rgp(ptsXY, epsilon);
+    // test rdpCalculation
+    // consider pressure values simply as 3rd dimension of vectors to keep them ...
+    rdpPoints = simplifyPoints(pts);
     for (let j = 0; j < rdpPoints.length; j = j + 1) {
       noFill();
       stroke(0, 255, 0);
-      ellipse(rdpPoints[j].x, rdpPoints[j].y, 20);
+      brushSize = minBrushSize + (rdpPoints[j][2] * pressureMultiplier);
+      ellipse(rdpPoints[j][0], rdpPoints[j][1], 2 * brushSize);
     }
-    print(`redraw: orig stroke ${ptsXY.length} vs rdp ${rdpPoints.length}`);
+    print(`redraw: orig stroke ${ptsXYp.length} vs rdp ${rdpPoints.length}`);
   }
 }
 
@@ -159,30 +156,28 @@ function redo() {
   }
 }
 
-function rgp(points = [], epsilon = 0.1) {
-  const p1 = points[0];
-  const p2 = points[points.length - 1];
-  const { index, dist } = furthestPoint(p1, p2, points);
-
+// --- douglas-peucker reduction ---------
+function rgp(pts = [], epsilon = 0.1) {
+  const p1 = pts[0];
+  const p2 = pts[pts.length - 1];
+  const { index, dist } = furthestPoint(p1, p2, pts);
   if (dist > epsilon) {
-    return [...rgp(points.slice(0, index + 1), epsilon), ...rgp(points.slice(index).slice(1), epsilon)];
+    return [...rgp(pts.slice(0, index + 1), epsilon), ...rgp(pts.slice(index).slice(1), epsilon)];
   } else {
     return p1 == p2 ? [p1] : [p1, p2];
   }
 }
 
-function furthestPoint(p1, p2, points) {
+function furthestPoint(p1, p2, pts) {
   let dmax = 0;
   let maxI = -1;
-  for (let i = 0; i < points.length; i++) {
-    const dtemp = perpendicularDist(points[i], p1, p2);
-
+  for (let i = 0; i < pts.length; i++) {
+    const dtemp = perpendicularDist(pts[i], p1, p2);
     if (dtemp > dmax) {
       dmax = dtemp;
       maxI = i;
     }
   }
-
   return { index: maxI, dist: dmax };
 }
 
@@ -193,6 +188,33 @@ function perpendicularDist(p, p1, p2) {
   const c = a.cross(b).mag();
   const d = p2.copy().sub(p1).mag();
   return c / d;
+}
+// ----------------------------------------
+
+function simplifyStrokes() {
+  strokesSimplified = [];
+  for (let i = 0; i < strokes.length; i = i + 1) {
+    pts = strokes[i];
+    rdp = simplifyPoints(pts);
+    strokesSimplified.push(rdp);
+  }
+  return strokesSimplified;
+}
+
+function simplifyPoints(pts = []) {
+  // convert to p5.Vectors for the algorithm
+  ptsXYp = [];
+  for (let j = 0; j < pts.length; j = j + 1) {
+    ptsXYp.push(createVector(pts[j][0], pts[j][1], pts[j][2]));
+  }
+  rdpPoints = rgp(ptsXYp, epsilon);
+
+  // convert back to arrays again
+  rdp = []
+  for (let j = 0; j < rdpPoints.length; j = j + 1) {
+    rdp.push(rdpPoints[j].array());
+  }
+  return rdp;
 }
 
 function save2file() {
@@ -211,9 +233,11 @@ function save2file() {
   writer.write("  movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], rapid_ms, accel_mss, 0, 0)\n");
   writer.write("  sleep(1)\n");
   
+  // simplify strokes first
+  strokesSimplified = simplifyStrokes(strokes);
   // write strokes
-  for (let i = 0; i < strokes.length; i = i + 1) {
-    pts = strokes[i];
+  for (let i = 0; i < strokesSimplified.length; i = i + 1) {
+    pts = strokesSimplified[i];
 
     // move to first point with zUp
     pCanvas = pts[0];
