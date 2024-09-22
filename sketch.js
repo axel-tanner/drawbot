@@ -249,7 +249,7 @@ function save2file() {
     for (let j = 0; j < pts.length; j = j + 1) {
       pCanvas = pts[j];
       pReal = convert(pCanvas);
-      writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zDown - pReal[2]*zPressureRange},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
+      writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${round(zDown - pReal[2]*zPressureRange, 5)},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
     }
 
     // move to last point with zUp
@@ -349,8 +349,8 @@ function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
 function convert(p) {
   prx = round(p[0] / canvasWidth * realWidth, 5);
   pry = round(p[1] / canvasHeight * realHeight, 5);
-  prz = round(p[2], 4); // this is the pressure
-  return [prx, pry. prz];
+  prz = p[2]; // this is the pressure
+  return [prx, pry, prz];
 }
 
 // Initializing Pressure.js
