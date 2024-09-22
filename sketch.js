@@ -381,13 +381,13 @@ function initPressure() {
         pressure = force;
         
       }
-    }, {only: 'button', preventSelect: false});
+    }); //, {only: 'button', preventSelect: false});
   
     Pressure.config({
       polyfill: true, // use time-based fallback ?
       polyfillSpeedUp: 1000, // how long does the fallback take to reach full pressure
       polyfillSpeedDown: 0,
-      preventSelect: true,
+      preventSelect: false,
       only: null
  		 });
   
