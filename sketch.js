@@ -14,7 +14,8 @@
 // done - tune the epsilon parameter for douglas-peucker ...
 // done - implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
 // TODO - pressure to z value - test
-// TODO - get rid of trailing points when mouse is not pressed anymore / maybe try first on tablet - maybe this is the polyfillSpeedDown value?
+// done - get rid of trailing points when mouse is not pressed anymore -> polyfillSpeedDown value
+// TODO - why cannot press buttons with pencil?
 
 
 /***********************
@@ -60,7 +61,7 @@ const zUp = 0.03; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
 
-const epsilon = 2.0;
+const epsilon = 1.5;
 
 var points = [];
 var strokes = [];
@@ -385,7 +386,7 @@ function initPressure() {
     Pressure.config({
       polyfill: true, // use time-based fallback ?
       polyfillSpeedUp: 1000, // how long does the fallback take to reach full pressure
-      polyfillSpeedDown: 300,
+      polyfillSpeedDown: 0,
       preventSelect: true,
       only: null
  		 });
