@@ -15,7 +15,7 @@
 // done - implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
 // TODO - pressure to z value - test
 // done - get rid of trailing points when mouse is not pressed anymore -> polyfillSpeedDown value
-// TODO - why cannot press buttons with pencil?
+// TODO - why cannot press buttons with pencil? preventSelect?
 
 
 /***********************
@@ -381,7 +381,7 @@ function initPressure() {
         pressure = force;
         
       }
-    });
+    }, {only: 'button', preventSelect: false});
   
     Pressure.config({
       polyfill: true, // use time-based fallback ?
