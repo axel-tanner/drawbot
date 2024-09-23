@@ -87,7 +87,7 @@ function setup() {
   drawCanvas.position(0, 0);    
   
   let buttonSave = createButton('Save');
-  buttonSave.position(0, canvasHeight);
+  buttonSave.position(0, canvasHeight-60);
   buttonSave.mousePressed(save2file);
   // buttonSave.size(200, 100);
   buttonSave.style('font-size', fontSize);
@@ -95,18 +95,18 @@ function setup() {
 
   if (showDebug) {
     let buttonRedraw = createButton('Redraw');
-    buttonRedraw.position(170, canvasHeight);
+    buttonRedraw.position(170, canvasHeight-60);
     buttonRedraw.mousePressed(redrawCanvas);
     buttonRedraw.style('font-size', fontSize);
   }
 
   let buttonUndo = createButton('Undo');
-  buttonUndo.position(300, canvasHeight);
+  buttonUndo.position(300, canvasHeight-60);
   buttonUndo.mousePressed(undo);
   buttonUndo.style('font-size', fontSize);
 
   let buttonRedo = createButton('Redo');
-  buttonRedo.position(400, canvasHeight);
+  buttonRedo.position(400, canvasHeight-60);
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
 
