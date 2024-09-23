@@ -57,7 +57,7 @@ const canvasWidth  = 800;
 const canvasHeight = 600;
 const realWidth = 0.4;   // meter
 const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
-const zUp = 0.03; // meter - height when not drawing
+const zUp = 0.02; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
 
@@ -381,16 +381,15 @@ function initPressure() {
         pressure = force;
         
       }
-    }); //, {only: 'button', preventSelect: false});
+    });
   
     Pressure.config({
       polyfill: true, // use time-based fallback ?
       polyfillSpeedUp: 1000, // how long does the fallback take to reach full pressure
       polyfillSpeedDown: 0,
-      preventSelect: false,
+      preventSelect: true,
       only: null
  		 });
-  
 }
 
 // Disabling scrolling and bouncing on iOS Safari
