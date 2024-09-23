@@ -16,6 +16,8 @@
 // TODO - pressure to z value - test
 // done - get rid of trailing points when mouse is not pressed anymore -> polyfillSpeedDown value
 // TODO - why cannot press buttons with pencil? preventSelect?
+// TODO - prevent touching with hand on canvas? probably would prevent mouse on screen too ...
+// done - 'spiegelverkehrt'
 
 
 /***********************
@@ -61,6 +63,8 @@ const zUp = 0.02; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
 
+const fontSize = '20px';
+
 const epsilon = 1.5;
 
 var points = [];
@@ -85,18 +89,24 @@ function setup() {
   let buttonSave = createButton('Click to save');
   buttonSave.position(0, canvasHeight);
   buttonSave.mousePressed(save2file);
+  // buttonSave.size(200, 100);
+  buttonSave.style('font-size', fontSize);
+  buttonSave.style('background-color', '#f0cece');
 
   let buttonRedraw = createButton('Redraw');
-  buttonRedraw.position(100, canvasHeight);
+  buttonRedraw.position(150, canvasHeight);
   buttonRedraw.mousePressed(redrawCanvas);
+  buttonRedraw.style('font-size', fontSize);
 
   let buttonUndo = createButton('Undo');
-  buttonUndo.position(200, canvasHeight);
+  buttonUndo.position(300, canvasHeight);
   buttonUndo.mousePressed(undo);
+  buttonUndo.style('font-size', fontSize);
 
   let buttonRedo = createButton('Redo');
-  buttonRedo.position(250, canvasHeight);
+  buttonRedo.position(370, canvasHeight);
   buttonRedo.mousePressed(redo);
+  buttonRedo.style('font-size', fontSize);
 
   rect(2, 2, canvasWidth-4, canvasHeight-4);
 }
@@ -348,7 +358,7 @@ function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
 ************************/
 
 function convert(p) {
-  prx = round(p[0] / canvasWidth * realWidth, 5);
+  prx = round((canvasWidth - p[0]) / canvasWidth * realWidth, 5);
   pry = round(p[1] / canvasHeight * realHeight, 5);
   prz = p[2]; // this is the pressure
   return [prx, pry, prz];
