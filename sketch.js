@@ -55,8 +55,8 @@ var isPressureInit = false;
 var isDrawing = false;
 var isDrawingJustStarted = false;
 
-const canvasWidth  = 800;
-const canvasHeight = 600;
+const canvasWidth  = 1200;   // ipad 12,9 3rd generation has 1024 × 1366 px
+const canvasHeight = 800;
 const realWidth = 0.4;   // meter
 const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.02; // meter - height when not drawing
