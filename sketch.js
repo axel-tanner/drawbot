@@ -239,11 +239,11 @@ function simplifyPoints(pts = []) {
   rdpPoints = rgp(ptsXYp, epsilon);
 
   // convert back to arrays again
-  rdp = []
+  rdpline = []
   for (let j = 0; j < rdpPoints.length; j = j + 1) {
-    rdp.push(rdpPoints[j].array());
+    rdpline.push(rdpPoints[j].array());
   }
-  return rdp;
+  return rdpline;
 }
 
 function save2file() {
