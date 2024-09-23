@@ -28,16 +28,16 @@
 var pressureMultiplier = 10; 
 
 // What is the smallest size for the brush?
-var minBrushSize = 1;
+var minBrushSize = 2;
 
 // Higher numbers give a smoother stroke
-var brushDensity = 5;
+var brushDensity = 10;
 
 var showDebug = true;
 
 // Jitter smoothing parameters
 // See: http://cristal.univ-lille.fr/~casiez/1euro/
-var minCutoff = 0.0001; // decrease this to get rid of slow speed jitter but increase lag (must be > 0)
+var minCutoff = 0.0000001; // decrease this to get rid of slow speed jitter but increase lag (must be > 0)
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
 /***********************
@@ -65,7 +65,7 @@ const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1
 
 const fontSize = '20px';
 
-const epsilon = 1.5;
+const epsilon = 1.2;
 
 var points = [];
 var strokes = [];
@@ -86,17 +86,19 @@ function setup() {
   drawCanvas.id("drawingCanvas");
   drawCanvas.position(0, 0);    
   
-  let buttonSave = createButton('Click to save');
+  let buttonSave = createButton('Save');
   buttonSave.position(0, canvasHeight);
   buttonSave.mousePressed(save2file);
   // buttonSave.size(200, 100);
   buttonSave.style('font-size', fontSize);
-  buttonSave.style('background-color', '#f0cece');
+  // buttonSave.style('background-color', '#f0cece');
 
-  let buttonRedraw = createButton('Redraw');
-  buttonRedraw.position(150, canvasHeight);
-  buttonRedraw.mousePressed(redrawCanvas);
-  buttonRedraw.style('font-size', fontSize);
+  if (showDebug) {
+    let buttonRedraw = createButton('Redraw');
+    buttonRedraw.position(170, canvasHeight);
+    buttonRedraw.mousePressed(redrawCanvas);
+    buttonRedraw.style('font-size', fontSize);
+  }
 
   let buttonUndo = createButton('Undo');
   buttonUndo.position(300, canvasHeight);
@@ -104,7 +106,7 @@ function setup() {
   buttonUndo.style('font-size', fontSize);
 
   let buttonRedo = createButton('Redo');
-  buttonRedo.position(370, canvasHeight);
+  buttonRedo.position(400, canvasHeight);
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
 
@@ -138,16 +140,18 @@ function redrawCanvas() {
       ellipse(penX, penY, brushSize);
     }
 
-    // test rdpCalculation
-    // consider pressure values simply as 3rd dimension of vectors to keep them ...
-    rdpPoints = simplifyPoints(pts);
-    for (let j = 0; j < rdpPoints.length; j = j + 1) {
-      noFill();
-      stroke(0, 255, 0);
-      brushSize = minBrushSize + (rdpPoints[j][2] * pressureMultiplier);
-      ellipse(rdpPoints[j][0], rdpPoints[j][1], 2 * brushSize);
+    if (showDebug) {
+      // show rdpCalculation
+      // consider pressure values simply as 3rd dimension of vectors to keep them ...
+      rdpPoints = simplifyPoints(pts);
+      for (let j = 0; j < rdpPoints.length; j = j + 1) {
+        noFill();
+        stroke(0, 255, 0);
+        brushSize = minBrushSize + (rdpPoints[j][2] * pressureMultiplier);
+        ellipse(rdpPoints[j][0], rdpPoints[j][1], 2 * brushSize);
+      }
+      print(`redraw: orig stroke ${ptsXYp.length} vs rdp ${rdpPoints.length}`);
     }
-    print(`redraw: orig stroke ${ptsXYp.length} vs rdp ${rdpPoints.length}`);
   }
 }
 
@@ -327,7 +331,9 @@ function draw() {
 function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
   d = dist(prevPenX, prevPenY, penX, penY);
 
-  fill(100, 100, 100, 25);
+  if (showDebug) {
+    fill(100, 100, 100, 25);
+  }
 
   // The bigger the distance the more ellipses
   // will be drawn to fill in the empty space
@@ -416,3 +422,18 @@ function disableScroll(){
 function enableScroll(){
     document.body.removeEventListener('touchmove', preventDefault, { passive: false });
 }*/
+
+var xStart, yStart = 0; 
+
+document.addEventListener('touchstart', function(e) {
+    xStart = e.touches[0].screenX;
+    yStart = e.touches[0].screenY;
+}); 
+
+document.addEventListener('touchmove', function(e) {
+    var xMovement = Math.abs(e.touches[0].screenX - xStart);
+    var yMovement = Math.abs(e.touches[0].screenY - yStart);
+    if((yMovement * 3) > xMovement) {
+        e.preventDefault();
+    }
+});
