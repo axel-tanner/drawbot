@@ -28,7 +28,7 @@
 var pressureMultiplier = 10; 
 
 // What is the smallest size for the brush?
-var minBrushSize = 2;
+var minBrushSize = 1;
 
 // Higher numbers give a smoother stroke
 var brushDensity = 10;
@@ -144,11 +144,23 @@ function redrawCanvas() {
       // show rdpCalculation
       // consider pressure values simply as 3rd dimension of vectors to keep them ...
       rdpPoints = simplifyPoints(pts);
+      prevPenX = rdpPoints[0][0];
+      prevPenY = rdpPoints[0][1];
+      prevBrushSize =  minBrushSize + (rdpPoints[0][2] * pressureMultiplier);
       for (let j = 0; j < rdpPoints.length; j = j + 1) {
+        p = rdpPoints[j];
+        penX = p[0];
+        penY = p[1];
+        pressure = p[2];
         noFill();
         stroke(0, 255, 0);
         brushSize = minBrushSize + (rdpPoints[j][2] * pressureMultiplier);
         ellipse(rdpPoints[j][0], rdpPoints[j][1], 2 * brushSize);
+        fill(0, 140, 0);
+        drawLine(prevPenX, prevPenY, 2*prevBrushSize, penX, penY, 2*brushSize, rdp=true);
+        prevBrushSize = brushSize;
+        prevPenX = penX;
+        prevPenY = penY;
       }
       print(`redraw: orig stroke ${ptsXYp.length} vs rdp ${rdpPoints.length}`);
     }
@@ -321,18 +333,21 @@ function draw() {
   } else {
     if (points.length > 0) {
       strokes.push(points);
-      points = [];
       // clear history of strokes
       deletedStrokes = [];
     }
+    points = [];
   }
 }
 
-function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize) {
+function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize, rdp=false) {
   d = dist(prevPenX, prevPenY, penX, penY);
 
   if (showDebug) {
     fill(100, 100, 100, 25);
+  }
+  if (rdp) {
+    fill(0, 140, 0, 100, 25);
   }
 
   // The bigger the distance the more ellipses
