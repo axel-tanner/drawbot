@@ -306,6 +306,10 @@ function draw() {
     // Smooth out the position of the pointer 
     penX = xFilter.filter(mouseX, millis());
     penY = yFilter.filter(mouseY, millis());
+    // what to do about outside points ...
+    if (penX < 0 || penX > canvasWidth-1 || penY < 0 || penY > canvasHeight-1) {
+      return;
+    }
     
     // What to do on the first frame of the stroke
     if(isDrawingJustStarted) {
