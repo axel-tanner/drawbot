@@ -462,38 +462,17 @@ function enableScroll(){
     document.body.removeEventListener('touchmove', preventDefault, { passive: false });
 }*/
 
-var xStart, yStart = 0; 
+// var xStart, yStart = 0; 
 
-document.addEventListener('touchstart', function(e) {
-    xStart = e.touches[0].screenX;
-    yStart = e.touches[0].screenY;
-}); 
+// document.addEventListener('touchstart', function(e) {
+//     xStart = e.touches[0].screenX;
+//     yStart = e.touches[0].screenY;
+// }); 
 
-document.addEventListener('touchmove', function(e) {
-    var xMovement = Math.abs(e.touches[0].screenX - xStart);
-    var yMovement = Math.abs(e.touches[0].screenY - yStart);
-    if((yMovement * 3) > xMovement) {
-        e.preventDefault();
-    }
-});
-
-// src/utils/scroll-lock.js
-const $body = document.querySelector('body');
-let scrollPosition = 0;
-
-export default {
-  enable() {
-    scrollPosition = window.pageYOffset;
-    $body.style.overflow = 'hidden';
-    $body.style.position = 'fixed';
-    $body.style.top = `-${scrollPosition}px`;
-    $body.style.width = '100%';
-  },
-  disable() {
-    $body.style.removeProperty('overflow');
-    $body.style.removeProperty('position');
-    $body.style.removeProperty('top');
-    $body.style.removeProperty('width');
-    window.scrollTo(0, scrollPosition);
-  }
-};
+// document.addEventListener('touchmove', function(e) {
+//     var xMovement = Math.abs(e.touches[0].screenX - xStart);
+//     var yMovement = Math.abs(e.touches[0].screenY - yStart);
+//     if((yMovement * 3) > xMovement) {
+//         e.preventDefault();
+//     }
+// });
