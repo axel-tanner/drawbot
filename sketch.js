@@ -19,9 +19,10 @@
 // TODO - prevent touching with hand on canvas? probably would prevent mouse on screen too ...
 // done - 'spiegelverkehrt'
 // TODO - canvas smaller?
+// TODO - fix page on safari somehow?
 // TODO - sometimes pressures doesn't seem to release - provoke by moving from outside
-// TODO - clear button
-// TODO - stronger effect of brush pressure on screen
+// done - clear button
+// done - stronger effect of brush pressure on screen
 
 
 /***********************
@@ -29,7 +30,7 @@
 ************************/
 
 // How sensitive is the brush size to the pressure of the pen?
-var pressureMultiplier = 10; 
+var pressureMultiplier = 15; 
 
 // What is the smallest size for the brush?
 var minBrushSize = 1;
@@ -69,7 +70,7 @@ const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1
 
 const fontSize = '20px';
 
-const epsilon = 1.2;
+const epsilon = 1.1;
 
 var points = [];
 var strokes = [];
@@ -96,21 +97,26 @@ function setup() {
   // buttonSave.size(200, 100);
   buttonSave.style('font-size', fontSize);
   // buttonSave.style('background-color', '#f0cece');
+  
+  let buttonClear = createButton('Clear');
+  buttonClear.position(170, canvasHeight);
+  buttonClear.mousePressed(clearAll);
+  buttonClear.style('font-size', fontSize);
 
   if (showDebug) {
     let buttonRedraw = createButton('Redraw');
-    buttonRedraw.position(170, canvasHeight);
+    buttonRedraw.position(340, canvasHeight);
     buttonRedraw.mousePressed(redrawCanvas);
     buttonRedraw.style('font-size', fontSize);
   }
 
   let buttonUndo = createButton('Undo');
-  buttonUndo.position(300, canvasHeight);
+  buttonUndo.position(440, canvasHeight);
   buttonUndo.mousePressed(undo);
   buttonUndo.style('font-size', fontSize);
 
   let buttonRedo = createButton('Redo');
-  buttonRedo.position(400, canvasHeight);
+  buttonRedo.position(540, canvasHeight);
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
 
@@ -189,6 +195,16 @@ function redo() {
   }
 }
 
+function clearAll() {
+  print("in clearAll");
+  len = strokes.length;
+  for (let i = 0; i < len; i = i + 1) {
+    s = strokes.pop();
+    deletedStrokes.push(s);
+  }
+  redrawCanvas();
+}
+
 // --- douglas-peucker reduction ---------
 function rgp(pts = [], epsilon = 0.1) {
   const p1 = pts[0];
@@ -259,7 +275,7 @@ function save2file() {
   writer.write("  global rapid_ms = 0.25\n");
   writer.write("  global feed_ms = 0.01\n");
   writer.write("  global accel_mss = 0.25\n");
-  writer.write("  global blend_radius_m = 0.001\n");
+  writer.write("  global blend_radius_m = 0.0002\n");
   writer.write("  global approach = 0.03\n");
   writer.write("  global feature = drawing_plane\n");
 
