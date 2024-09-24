@@ -19,7 +19,7 @@
 // TODO - prevent touching with hand on canvas? probably would prevent mouse on screen too ...
 // done - 'spiegelverkehrt'
 // TODO - canvas smaller?
-// TODO - fix page on safari somehow?
+// done - fix page on safari somehow?
 // TODO - sometimes pressures doesn't seem to release - provoke by moving from outside
 // done - clear button
 // done - stronger effect of brush pressure on screen
@@ -30,7 +30,7 @@
 ************************/
 
 // How sensitive is the brush size to the pressure of the pen?
-var pressureMultiplier = 15; 
+var pressureMultiplier = 12; 
 
 // What is the smallest size for the brush?
 var minBrushSize = 1;
@@ -315,6 +315,7 @@ function save2file() {
   print("... finished");
 }
 
+// ----------------------------------------------------
 function draw() {
     
   // Start Pressure.js if it hasn't started already
@@ -419,8 +420,10 @@ function initPressure() {
       
       start: function(event){
         // this is called on force start
-        isDrawing = true;
-        isDrawingJustStarted = true;
+        if (event.pointerType == 'pencil') {
+          isDrawing = true;
+          isDrawingJustStarted = true;
+        }
   		},
       end: function(){
     		// this is called on force end
@@ -428,13 +431,15 @@ function initPressure() {
         pressure = 0;
   		},
       change: function(force, event) {
-        if (isPressureInit == false){
-          console.log("Pressure.js initialized successfully");
-	        isPressureInit = true;
-      	}
-        //console.log(force);
-        pressure = force;
-        
+        if (event.pointerType == 'pencil') {
+          print(event);
+          if (isPressureInit == false){
+            console.log("Pressure.js initialized successfully");
+            isPressureInit = true;
+          }
+          //console.log(force);
+          pressure = force;
+        }
       }
     });
   
@@ -462,6 +467,8 @@ function enableScroll(){
     document.body.removeEventListener('touchmove', preventDefault, { passive: false });
 }*/
 
+
+// 2024-09-24: somehow only after removing this the page is fixed on ios safari
 // var xStart, yStart = 0; 
 
 // document.addEventListener('touchstart', function(e) {
