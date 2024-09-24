@@ -98,8 +98,7 @@ function setup() {
   buttonSave.style('font-size', fontSize);
   // buttonSave.style('background-color', '#f0cece');
   
-  ua = window.navigator.userAgent;
-  let buttonClear = createButton(ua); //'Clear');
+  let buttonClear = createButton('Clear');
   buttonClear.position(170, canvasHeight);
   buttonClear.mousePressed(clearAll);
   buttonClear.style('font-size', fontSize);
@@ -116,7 +115,8 @@ function setup() {
   buttonUndo.mousePressed(undo);
   buttonUndo.style('font-size', fontSize);
 
-  let buttonRedo = createButton('Redo');
+  ua = window.navigator.userAgent;
+  let buttonRedo = createButton(ua); //'Redo');
   buttonRedo.position(540, canvasHeight);
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
@@ -420,9 +420,9 @@ function initPressure() {
     Pressure.set('#drawingCanvas', {
       
       start: function(event){
-        print(navigator.userAgent);
+        ua = window.navigator.userAgent;
         // this is called on force start
-        if (event.pointerType == 'pen') {
+        if (event.pointerType == 'pen' || !ua.includes("Mobile")) {
           isDrawing = true;
           isDrawingJustStarted = true;
         }
@@ -433,8 +433,8 @@ function initPressure() {
         pressure = 0;
   		},
       change: function(force, event) {
-        if (event.pointerType == 'pen') {
-          print(event);
+        ua = window.navigator.userAgent;
+        if (event.pointerType == 'pen' || !ua.includes("Mobile")) {
           if (isPressureInit == false){
             console.log("Pressure.js initialized successfully");
             isPressureInit = true;
