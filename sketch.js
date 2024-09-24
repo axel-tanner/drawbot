@@ -18,6 +18,10 @@
 // TODO - why cannot press buttons with pencil? preventSelect?
 // TODO - prevent touching with hand on canvas? probably would prevent mouse on screen too ...
 // done - 'spiegelverkehrt'
+// TODO - canvas smaller?
+// TODO - sometimes pressures doesn't seem to release - provoke by moving from outside
+// TODO - clear button
+// TODO - stronger effect of brush pressure on screen
 
 
 /***********************
@@ -55,8 +59,8 @@ var isPressureInit = false;
 var isDrawing = false;
 var isDrawingJustStarted = false;
 
-const canvasWidth  = 1200;   // ipad 12,9 3rd generation has 1024 × 1366 px
-const canvasHeight = 800;
+const canvasWidth  = 900;   // ipad 12,9 3rd generation has 1024 × 1366 px
+const canvasHeight = 600;
 const realWidth = 0.4;   // meter
 const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.02; // meter - height when not drawing
@@ -255,7 +259,7 @@ function save2file() {
   writer.write("  global rapid_ms = 0.25\n");
   writer.write("  global feed_ms = 0.01\n");
   writer.write("  global accel_mss = 0.25\n");
-  writer.write("  global blend_radius_m = 0.005\n");
+  writer.write("  global blend_radius_m = 0.001\n");
   writer.write("  global approach = 0.03\n");
   writer.write("  global feature = drawing_plane\n");
 
