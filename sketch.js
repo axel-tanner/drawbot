@@ -98,7 +98,8 @@ function setup() {
   buttonSave.style('font-size', fontSize);
   // buttonSave.style('background-color', '#f0cece');
   
-  let buttonClear = createButton('Clear');
+  ua = window.navigator.userAgent;
+  let buttonClear = createButton(ua); //'Clear');
   buttonClear.position(170, canvasHeight);
   buttonClear.mousePressed(clearAll);
   buttonClear.style('font-size', fontSize);
