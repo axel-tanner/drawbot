@@ -105,7 +105,7 @@ function setup() {
 
   if (showDebug) {
     let buttonRedraw = createButton('Redraw');
-    buttonRedraw.position(340, canvasHeight);
+    buttonRedraw.position(310, canvasHeight);
     buttonRedraw.mousePressed(redrawCanvas);
     buttonRedraw.style('font-size', fontSize);
   }

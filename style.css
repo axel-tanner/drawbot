@@ -1,9 +1,12 @@
-html, body {
-  margin: 0;
+html,
+body {
+  /* margin: 0;
   padding: 0;
-  position: fixed;
   height: 100%;
-}
+  width: 100%; */
+  overflow: hidden;
+  position: fixed;
+}  
 canvas {
   display: block;
 }
