@@ -72,6 +72,8 @@ const fontSize = '20px';
 
 const epsilon = 1.1;
 
+const isIpad = navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+
 var points = [];
 var strokes = [];
 var deletedStrokes = [];
@@ -422,7 +424,7 @@ function initPressure() {
       start: function(event){
         ua = window.navigator.userAgent;
         // this is called on force start
-        if (event.pointerType == 'pen' || !ua.includes("Mobile")) {
+        if (event.pointerType == 'pen' || !isIpad) {
           isDrawing = true;
           isDrawingJustStarted = true;
         }
@@ -434,7 +436,7 @@ function initPressure() {
   		},
       change: function(force, event) {
         ua = window.navigator.userAgent;
-        if (event.pointerType == 'pen' || !ua.includes("Mobile")) {
+        if (event.pointerType == 'pen' || !isIpad) {
           if (isPressureInit == false){
             console.log("Pressure.js initialized successfully");
             isPressureInit = true;
