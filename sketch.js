@@ -16,7 +16,7 @@
 // TODO - pressure to z value - test
 // done - get rid of trailing points when mouse is not pressed anymore -> polyfillSpeedDown value
 // TODO - why cannot press buttons with pencil? preventSelect?
-// TODO - prevent touching with hand on canvas? probably would prevent mouse on screen too ...
+// done - detect iPad and only take event.pointerType = 'pen'
 // done - 'spiegelverkehrt'
 // TODO - canvas smaller?
 // done - fix page on safari somehow?
@@ -118,7 +118,7 @@ function setup() {
   buttonUndo.style('font-size', fontSize);
 
   ua = window.navigator.userAgent;
-  let buttonRedo = createButton(ua); //'Redo');
+  let buttonRedo = createButton('Redo');
   buttonRedo.position(540, canvasHeight);
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
