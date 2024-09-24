@@ -420,7 +420,7 @@ function initPressure() {
       
       start: function(event){
         // this is called on force start
-        if (event.pointerType == 'pencil') {
+        if (event.pointerType != 'mouse') {
           isDrawing = true;
           isDrawingJustStarted = true;
         }
@@ -431,7 +431,7 @@ function initPressure() {
         pressure = 0;
   		},
       change: function(force, event) {
-        if (event.pointerType == 'pencil') {
+        if (event.pointerType != 'mouse') {
           print(event);
           if (isPressureInit == false){
             console.log("Pressure.js initialized successfully");
