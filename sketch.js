@@ -419,8 +419,9 @@ function initPressure() {
     Pressure.set('#drawingCanvas', {
       
       start: function(event){
+        print(navigator.userAgent);
         // this is called on force start
-        if (event.pointerType != 'pen') {
+        if (event.pointerType == 'pen') {
           isDrawing = true;
           isDrawingJustStarted = true;
         }
@@ -431,7 +432,7 @@ function initPressure() {
         pressure = 0;
   		},
       change: function(force, event) {
-        if (event.pointerType != 'pen') {
+        if (event.pointerType == 'pen') {
           print(event);
           if (isPressureInit == false){
             console.log("Pressure.js initialized successfully");
