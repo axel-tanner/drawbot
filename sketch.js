@@ -15,14 +15,16 @@
 // done - implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
 // TODO - pressure to z value - test
 // done - get rid of trailing points when mouse is not pressed anymore -> polyfillSpeedDown value
-// TODO - why cannot press buttons with pencil? preventSelect?
+// done - why cannot press buttons with pencil? preventSelect? - just accept this
 // done - detect iPad and only take event.pointerType = 'pen'
 // done - 'spiegelverkehrt'
-// TODO - canvas smaller?
+// TODO - canvas size?
 // done - fix page on safari somehow?
-// TODO - sometimes pressures doesn't seem to release - provoke by moving from outside
+// done - sometimes pressures doesn't seem to release - provoke by moving from outside
 // done - clear button
 // done - stronger effect of brush pressure on screen
+// TODO - do some smoothing?
+// done - test the oneeurofiltering
 
 
 /***********************
@@ -70,7 +72,7 @@ const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1
 
 const fontSize = '20px';
 
-const epsilon = 1.1;
+const epsilon = 1.0;
 
 const isIpad = navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
 
@@ -170,7 +172,7 @@ function redrawCanvas() {
         brushSize = minBrushSize + (rdpPoints[j][2] * pressureMultiplier);
         ellipse(rdpPoints[j][0], rdpPoints[j][1], 2 * brushSize);
         fill(0, 140, 0);
-        drawLine(prevPenX, prevPenY, 2*prevBrushSize, penX, penY, 2*brushSize, rdp=true);
+        // drawLine(prevPenX, prevPenY, 2*prevBrushSize, penX, penY, 2*brushSize, rdp=true);
         prevBrushSize = brushSize;
         prevPenX = penX;
         prevPenY = penY;
@@ -351,6 +353,14 @@ function draw() {
     // Calculate the distance between previous and current position
     drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize);
     points.push([penX, penY, pressure]);
+
+    if (showDebug) {
+      push();
+      stroke(255, 0,0, 150);
+      noFill();
+      ellipse(mouseX, mouseY, 15);
+      pop();
+    }
 
     // Save the latest brush values for next frame
     prevBrushSize = brushSize;
