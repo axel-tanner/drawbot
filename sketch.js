@@ -1,5 +1,8 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
+// update handled by 'auto time stamp' extension
+time_saved =  "Last modified: 2024-09-25 17:20:36"
+
 // Apple Pencil demo using Pressure.js
 
 // Alternative method: https://github.com/quietshu/apple-pencil-safari-api-test
@@ -124,6 +127,11 @@ function setup() {
   buttonRedo.position(540, canvasHeight);
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
+
+  if (showDebug) {
+    ts = createElement('div', time_saved);
+    ts.position(0, canvasHeight + 30);
+  }
 
   rect(2, 2, canvasWidth-4, canvasHeight-4);
 }
@@ -280,7 +288,7 @@ function save2file() {
   writer.write("  global rapid_ms = 0.25\n");
   writer.write("  global feed_ms = 0.01\n");
   writer.write("  global accel_mss = 0.25\n");
-  writer.write("  global blend_radius_m = 0.0002\n");
+  writer.write("  global blend_radius_m = 0.0004\n");
   writer.write("  global approach = 0.03\n");
   // writer.write("  global feature = drawing_plane\n");
   writer.write("  global feature = p[-0.3,-0.45,0,0,0, -1.57]\n");
