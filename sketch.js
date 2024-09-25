@@ -68,7 +68,7 @@ const realWidth = 0.4;   // meter
 const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.02; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
-const zPressureRange = 0.005; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
+const zPressureRange = 0.002; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
 
 const fontSize = '20px';
 
@@ -282,7 +282,8 @@ function save2file() {
   writer.write("  global accel_mss = 0.25\n");
   writer.write("  global blend_radius_m = 0.0002\n");
   writer.write("  global approach = 0.03\n");
-  writer.write("  global feature = drawing_plane\n");
+  // writer.write("  global feature = drawing_plane\n");
+  writer.write("  global feature = p[-0.3,-0.45,0,0,0, -1.57]\n");
 
   writer.write("  movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], rapid_ms, accel_mss, 0, 0)\n");
   writer.write("  sleep(1)\n");
@@ -314,7 +315,7 @@ function save2file() {
   writer.write("  sleep(1)\n");
   writer.write("  movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], rapid_ms, accel_mss, 0, 0)\n");
   writer.write("end\n");
-  writer.write("Print()\n");
+  // writer.write("Print()\n");
   
   writer.close();
   print("... finished");
