@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-26T11:40:14"
+time_saved =  "Last modified: 2024-09-26T11:47:59"
 
 // Apple Pencil demo using Pressure.js
 
@@ -47,7 +47,7 @@ var showDebug = true;
 
 // Jitter smoothing parameters
 // See: http://cristal.univ-lille.fr/~casiez/1euro/
-var minCutoff = 0.0000001; // decrease this to get rid of slow speed jitter but increase lag (must be > 0)
+var minCutoff = 0.00001; // decrease this to get rid of slow speed jitter but increase lag (must be > 0)
 var beta      = 1.0;  // increase this to get rid of high speed lag
 
 /***********************
@@ -66,7 +66,7 @@ var isDrawing = false;
 var isDrawingJustStarted = false;
 
 const canvasWidth  = 1366;   // ipad 12,9 3rd generation has 1024 × 1366 px
-const canvasHeight = 900;
+const canvasHeight = 890;
 const realWidth = 0.4;   // meter
 const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.02; // meter - height when not drawing
@@ -132,7 +132,7 @@ function setup() {
   buttonRedo.style('font-size', fontSize);
 
   ts = createElement('div', time_saved.replace('Last modified: ', 'v'));
-  ts.position(0, canvasHeight + 35);
+  ts.position(20, canvasHeight + 35);
   ts.style('font-size', '10pt');
   ts.style('font-family', 'sans-serif');
 
