@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-26T11:47:59"
+time_saved =  "Last modified: 2024-09-26T11:53:55"
 
 // Apple Pencil demo using Pressure.js
 
@@ -180,10 +180,12 @@ function redrawCanvas() {
         penX = p[0];
         penY = p[1];
         pressure = p[2];
+        push();
         noFill();
         stroke(0, 255, 0);
         brushSize = minBrushSize + (rdpPoints[j][2] * pressureMultiplier);
         ellipse(rdpPoints[j][0], rdpPoints[j][1], 2 * brushSize);
+        pop();
         fill(0, 140, 0);
         // drawLine(prevPenX, prevPenY, 2*prevBrushSize, penX, penY, 2*brushSize, rdp=true);
         prevBrushSize = brushSize;
