@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-26T11:53:55"
+time_saved =  "Last modified: 2024-09-26T15:14:18"
 
 // Apple Pencil demo using Pressure.js
 
@@ -83,6 +83,8 @@ var points = [];
 var strokes = [];
 var deletedStrokes = [];
 var buttonRedraw;
+var sliderMC;
+var sliderBeta;
 
 function setup() {
     
@@ -137,6 +139,14 @@ function setup() {
   ts.style('font-family', 'sans-serif');
 
   rect(2, 2, canvasWidth-4, canvasHeight-4);
+
+  sliderMC = createSlider(0, 10, minCutoff, 0);
+  sliderMC.position(650, canvasHeight+5);
+  sliderMC.size(80);
+
+  sliderBeta = createSlider(0, 1, beta, 0);
+  sliderBeta.position(750, canvasHeight+5);
+  sliderBeta.size(80);
 
   toggleDebug();
 }
@@ -305,11 +315,11 @@ function save2file() {
   writer.write("def Print():\n");
   writer.write("  #set parameters\n");
   writer.write("  global rapid_ms = 0.25\n");
-  writer.write("  global feed_ms = 0.01\n");
+  writer.write("  global feed_ms = 0.15\n");
   writer.write("  global accel_mss = 0.25\n");
-  writer.write("  global blend_radius_m = 0.0004\n");
+  writer.write("  global blend_radius_m = 0.0005\n");
   writer.write("  global approach = 0.03\n");
-  // writer.write("  global feature = drawing_plane\n");
+  // writer.write("  global feature = drawing_plane\n"); /// this does not work remotely
   writer.write("  global feature = p[-0.3,-0.45,0,0,0, -1.57]\n");
 
   writer.write("  movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], rapid_ms, accel_mss, 0, 0)\n");
@@ -330,7 +340,7 @@ function save2file() {
     for (let j = 0; j < pts.length; j = j + 1) {
       pCanvas = pts[j];
       pReal = convert(pCanvas);
-      writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${round(zDown - pReal[2]*zPressureRange, 5)},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
+      writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${round(zDown - pReal[2]*zPressureRange, 5)},0,0,0]), accel_mss, v=feed_ms, t=0, r=blend_radius_m)\n`);
     }
 
     // move to last point with zUp
@@ -352,6 +362,10 @@ function save2file() {
 
 // ----------------------------------------------------
 function draw() {
+  minCutoff = sliderMC.value();
+  beta = sliderBeta.value();
+  // print(`mc: ${minCutoff} - beta: ${beta}`);
+  text(`mc: ${minCutoff} - beta: ${beta}`, 10, 20);
     
   // Start Pressure.js if it hasn't started already
   if(isPressureInit == false){
@@ -384,14 +398,16 @@ function draw() {
     drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize);
     points.push([penX, penY, pressure]);
 
-    // // show original mouse points
-    // if (showDebug) {
-    //   push();
-    //   stroke(255, 0,0, 150);
-    //   noFill();
-    //   ellipse(mouseX, mouseY, 15);
-    //   pop();
-    // }
+    // show original mouse points
+    if (showDebug) {
+      push();
+      stroke(0,0,255, 150);
+      noFill();
+      ellipse(penX, penY, 13);
+      stroke(255, 0,0, 150);
+      ellipse(mouseX, mouseY, 15);
+      pop();
+    }
 
     // Save the latest brush values for next frame
     prevBrushSize = brushSize;
