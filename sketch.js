@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-26T15:52:27"
+time_saved =  "Last modified: 2024-09-26T16:15:33"
 
 // Apple Pencil demo using Pressure.js
 
@@ -75,7 +75,7 @@ const zPressureRange = 0.002; // meter - change in z from 0 to full pressure = 1
 
 const fontSize = '20px';
 
-const epsilon = 1.0;
+const epsilon = 0.8;
 
 const isIpad = navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
 
