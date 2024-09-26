@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-26T11:32:23"
+time_saved =  "Last modified: 2024-09-26T11:40:14"
 
 // Apple Pencil demo using Pressure.js
 
@@ -43,7 +43,7 @@ var minBrushSize = 1;
 // Higher numbers give a smoother stroke
 var brushDensity = 10;
 
-var showDebug = false;
+var showDebug = true;
 
 // Jitter smoothing parameters
 // See: http://cristal.univ-lille.fr/~casiez/1euro/
@@ -114,12 +114,11 @@ function setup() {
   buttonRedraw.mousePressed(redrawCanvas);
   buttonRedraw.style('font-size', fontSize);
 
-  if (showDebug) {
-    let buttonDbg = createButton('o');
-    buttonDbg.position(0, canvasHeight);
-    buttonDbg.mousePressed(toggleDebug);
-    buttonDbg.style('font-size', fontSize/2);
-  }
+  let buttonDbg = createButton('o');
+  buttonDbg.position(0, canvasHeight);
+  buttonDbg.mousePressed(toggleDebug);
+  buttonDbg.style('font-size', fontSize/2);
+
 
   let buttonUndo = createButton('Undo');
   buttonUndo.position(440, canvasHeight);
@@ -132,14 +131,14 @@ function setup() {
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
 
-  if (showDebug) {
-    ts = createElement('div', time_saved.replace('Last modified: ', 'v'));
-    ts.position(0, canvasHeight + 35);
-    ts.style('font-size', '10pt');
-    ts.style('font-family', 'sans-serif');
-  }
+  ts = createElement('div', time_saved.replace('Last modified: ', 'v'));
+  ts.position(0, canvasHeight + 35);
+  ts.style('font-size', '10pt');
+  ts.style('font-family', 'sans-serif');
 
   rect(2, 2, canvasWidth-4, canvasHeight-4);
+
+  toggleDebug();
 }
 
 function redrawCanvas() { 
@@ -209,8 +208,10 @@ function toggleDebug() {
   showDebug = ! showDebug;
   if (showDebug) {
     buttonRedraw.style('visibility', 'visible');
+    ts.style('visibility', 'visible');
   } else {
     buttonRedraw.style('visibility', 'hidden');
+    ts.style('visibility', 'hidden');
   }
   redrawCanvas();
 }
