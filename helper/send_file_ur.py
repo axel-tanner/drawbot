@@ -1,15 +1,41 @@
 import socket
-import time
+import argparse
+import shutil
+import datetime
+import os
+
+parser = argparse.ArgumentParser(description='Send URScript file to UR10 robot')
+parser.add_argument('-i', '--input_file', type=str, help='input file with URScript code', required=False)
+
+args = parser.parse_args()
 
 PORT = 30001
 HOST = '192.168.125.21'
+DEFAULT_PATH = '/Users/axel/Library/Mobile Documents/com~apple~CloudDocs/Downloads/'
+DEFAULT_FILE = 'drawing.script'
 
-# rapid_ms = 0.25
-# accel_mss = 0.25
-# blend_radius_m = 0.0004
-feature = 'drawing_plane'
+if not args.input_file:
+    script_file = DEFAULT_PATH + DEFAULT_FILE
+else:
+    if '/' in args.input_file:
+        # take as absolute path
+        script_file = args.input_file
+    else:
+        # take as file in DEFAULT_PATH
+        script_file = DEFAULT_PATH + args.input_file
 
-script_file = '/Users/axel/Library/Mobile Documents/com~apple~CloudDocs/Downloads/drawing.script'
+# check if file exists
+if not os.path.isfile(script_file):
+    print(f'ERROR: File {script_file} does not exist!')
+    exit(1)
+
+print(f'Using as input: {script_file=}')
+
+# create a backup copy of the file
+backup_file = script_file + '.' + datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
+print(f'creating backup as {backup_file}')
+shutil.copy2(script_file, backup_file)
+exit()
 
 def client(lines):
     s = socket.socket()
@@ -19,14 +45,6 @@ def client(lines):
     print(command)
     s.send(command)
 
-    # for l in lines:
-    #     command = l.encode()
-    #     print(command)
-    #     s.send(command)
-    #     received_data = s.recv(1024)
-    #     # print(received_data)
-    #     time.sleep(0.4)
-
     s.close()
 
 if __name__ == '__main__':
@@ -34,10 +52,5 @@ if __name__ == '__main__':
     # read script file
     with open(script_file, 'r') as inp:
         script_lines = inp.readlines()
-
-#     script_lines = ['movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], 0.25, 0.25, 0, 0)\n',
-# #   'sleep(1)\n',
-# #   '#movel(pose_trans(drawing_plane, p[0.2346, 0.14452, 0.02,0,0,0]), 0.25, v=0.25, t=0, r=0.0005)\n',
-#   'movej([-1.20,-1.19,-2.39,-1.134,1.57,-1.26], 0.25, 0.25, 0, 0)\n']
 
     client(script_lines)
