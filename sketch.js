@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-26T15:14:18"
+time_saved =  "Last modified: 2024-09-26T15:52:27"
 
 // Apple Pencil demo using Pressure.js
 
@@ -83,8 +83,8 @@ var points = [];
 var strokes = [];
 var deletedStrokes = [];
 var buttonRedraw;
-var sliderMC;
-var sliderBeta;
+// var sliderMC;
+// var sliderBeta;
 
 function setup() {
     
@@ -140,13 +140,13 @@ function setup() {
 
   rect(2, 2, canvasWidth-4, canvasHeight-4);
 
-  sliderMC = createSlider(0, 10, minCutoff, 0);
-  sliderMC.position(650, canvasHeight+5);
-  sliderMC.size(80);
+  // sliderMC = createSlider(0, 10, minCutoff, 0);
+  // sliderMC.position(650, canvasHeight+5);
+  // sliderMC.size(80);
 
-  sliderBeta = createSlider(0, 1, beta, 0);
-  sliderBeta.position(750, canvasHeight+5);
-  sliderBeta.size(80);
+  // sliderBeta = createSlider(0, 1, beta, 0);
+  // sliderBeta.position(750, canvasHeight+5);
+  // sliderBeta.size(80);
 
   toggleDebug();
 }
@@ -177,6 +177,17 @@ function redrawCanvas() {
 
       ellipse(penX, penY, brushSize);
     }
+
+    // // try smoothing
+    // push()
+    // noFill();
+    // stroke(0,0,255);
+    // smoothedPoints = smoothLine(pts);
+    // for (let k=0; k < smoothedPoints.length; k++) {
+    //   let p = smoothedPoints[k];
+    //   ellipse(p[0], p[1], 16);
+    // }
+    // pop()
 
     if (showDebug) {
       // show rdpCalculation
@@ -362,10 +373,9 @@ function save2file() {
 
 // ----------------------------------------------------
 function draw() {
-  minCutoff = sliderMC.value();
-  beta = sliderBeta.value();
-  // print(`mc: ${minCutoff} - beta: ${beta}`);
-  text(`mc: ${minCutoff} - beta: ${beta}`, 10, 20);
+  // minCutoff = sliderMC.value();
+  // beta = sliderBeta.value();
+  // text(`mc: ${minCutoff} - beta: ${beta}`, 10, 20);
     
   // Start Pressure.js if it hasn't started already
   if(isPressureInit == false){
@@ -398,16 +408,16 @@ function draw() {
     drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize);
     points.push([penX, penY, pressure]);
 
-    // show original mouse points
-    if (showDebug) {
-      push();
-      stroke(0,0,255, 150);
-      noFill();
-      ellipse(penX, penY, 13);
-      stroke(255, 0,0, 150);
-      ellipse(mouseX, mouseY, 15);
-      pop();
-    }
+    // // show original mouse points
+    // if (showDebug) {
+    //   push();
+    //   stroke(0,0,255, 150);
+    //   noFill();
+    //   ellipse(penX, penY, 13);
+    //   stroke(255, 0,0, 150);
+    //   ellipse(mouseX, mouseY, 15);
+    //   pop();
+    // }
 
     // Save the latest brush values for next frame
     prevBrushSize = brushSize;
@@ -417,12 +427,38 @@ function draw() {
     isDrawingJustStarted = false;
   } else {
     if (points.length > 0) {
-      strokes.push(points);
+      smoothedPoints = smoothLine(points);
+      // strokes.push(points);
+      strokes.push(smoothedPoints);
       // clear history of strokes
       deletedStrokes = [];
+      redrawCanvas();
     }
     points = [];
   }
+}
+// Simple smoothing using moving average technique
+function smoothLine(points) {
+  let smoothed = [];
+  
+  // Smooth every point by averaging with its neighbors
+  smoothed.push(points[0]);
+  for (let i = 1; i < points.length-1; i++) {
+    let prev = points[i - 1]
+    let curr = points[i];
+    let next = points[i + 1];
+
+    // Calculate the smoothed x and y as the average of the previous, current, and next points
+    let avgX = (prev[0] + curr[0] + next[0]) / 3;
+    let avgY = (prev[1] + curr[1] + next[1]) / 3;
+    let avgP = (prev[2] + curr[2] + next[2]) / 3;
+
+    // Add the smoothed point to the new list
+    smoothed.push([avgX, avgY, avgP]);
+  }
+  smoothed.push(points[points.length-1]);
+   
+  return smoothed;
 }
 
 function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize, rdp=false) {
