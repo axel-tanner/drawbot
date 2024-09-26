@@ -35,7 +35,6 @@ print(f'Using as input: {script_file=}')
 backup_file = script_file + '.' + datetime.datetime.now().strftime('%Y%m%dT%H%M%S')
 print(f'creating backup as {backup_file}')
 shutil.copy2(script_file, backup_file)
-exit()
 
 def client(lines):
     s = socket.socket()
