@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-25 17:39:56"
+time_saved =  "Last modified: 2024-09-26T11:32:23"
 
 // Apple Pencil demo using Pressure.js
 
@@ -21,7 +21,7 @@ time_saved =  "Last modified: 2024-09-25 17:39:56"
 // done - why cannot press buttons with pencil? preventSelect? - just accept this
 // done - detect iPad and only take event.pointerType = 'pen'
 // done - 'spiegelverkehrt'
-// TODO - canvas size?
+// done - canvas size?
 // done - fix page on safari somehow?
 // done - sometimes pressures doesn't seem to release - provoke by moving from outside
 // done - clear button
@@ -43,7 +43,7 @@ var minBrushSize = 1;
 // Higher numbers give a smoother stroke
 var brushDensity = 10;
 
-var showDebug = true;
+var showDebug = false;
 
 // Jitter smoothing parameters
 // See: http://cristal.univ-lille.fr/~casiez/1euro/
@@ -65,8 +65,8 @@ var isPressureInit = false;
 var isDrawing = false;
 var isDrawingJustStarted = false;
 
-const canvasWidth  = 900;   // ipad 12,9 3rd generation has 1024 × 1366 px
-const canvasHeight = 600;
+const canvasWidth  = 1366;   // ipad 12,9 3rd generation has 1024 × 1366 px
+const canvasHeight = 900;
 const realWidth = 0.4;   // meter
 const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.02; // meter - height when not drawing
@@ -82,6 +82,7 @@ const isIpad = navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
 var points = [];
 var strokes = [];
 var deletedStrokes = [];
+var buttonRedraw;
 
 function setup() {
     
@@ -99,22 +100,25 @@ function setup() {
   drawCanvas.position(0, 0);    
   
   let buttonSave = createButton('Save');
-  buttonSave.position(0, canvasHeight);
+  buttonSave.position(40, canvasHeight);
   buttonSave.mousePressed(save2file);
-  // buttonSave.size(200, 100);
   buttonSave.style('font-size', fontSize);
-  // buttonSave.style('background-color', '#f0cece');
   
   let buttonClear = createButton('Clear');
   buttonClear.position(170, canvasHeight);
   buttonClear.mousePressed(clearAll);
   buttonClear.style('font-size', fontSize);
 
+  buttonRedraw = createButton('Redraw');
+  buttonRedraw.position(310, canvasHeight);
+  buttonRedraw.mousePressed(redrawCanvas);
+  buttonRedraw.style('font-size', fontSize);
+
   if (showDebug) {
-    let buttonRedraw = createButton('Redraw');
-    buttonRedraw.position(310, canvasHeight);
-    buttonRedraw.mousePressed(redrawCanvas);
-    buttonRedraw.style('font-size', fontSize);
+    let buttonDbg = createButton('o');
+    buttonDbg.position(0, canvasHeight);
+    buttonDbg.mousePressed(toggleDebug);
+    buttonDbg.style('font-size', fontSize/2);
   }
 
   let buttonUndo = createButton('Undo');
@@ -130,7 +134,7 @@ function setup() {
 
   if (showDebug) {
     ts = createElement('div', time_saved.replace('Last modified: ', 'v'));
-    ts.position(0, canvasHeight + 30);
+    ts.position(0, canvasHeight + 35);
     ts.style('font-size', '10pt');
     ts.style('font-family', 'sans-serif');
   }
@@ -199,6 +203,16 @@ function undo() {
     deletedStrokes.push(deleted);
     redrawCanvas();
   }
+}
+
+function toggleDebug() {
+  showDebug = ! showDebug;
+  if (showDebug) {
+    buttonRedraw.style('visibility', 'visible');
+  } else {
+    buttonRedraw.style('visibility', 'hidden');
+  }
+  redrawCanvas();
 }
 
 function redo() {
@@ -296,6 +310,7 @@ function save2file() {
   writer.write("  global feature = p[-0.3,-0.45,0,0,0, -1.57]\n");
 
   writer.write("  movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], rapid_ms, accel_mss, 0, 0)\n");
+  writer.write("  stopl(accel_mss)\n");
   writer.write("  sleep(1)\n");
   
   // simplify strokes first
@@ -322,6 +337,7 @@ function save2file() {
 
   }
   // outro
+  writer.write("  stopl(accel_mss)\n");
   writer.write("  sleep(1)\n");
   writer.write("  movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], rapid_ms, accel_mss, 0, 0)\n");
   writer.write("end\n");
@@ -365,13 +381,14 @@ function draw() {
     drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize);
     points.push([penX, penY, pressure]);
 
-    if (showDebug) {
-      push();
-      stroke(255, 0,0, 150);
-      noFill();
-      ellipse(mouseX, mouseY, 15);
-      pop();
-    }
+    // // show original mouse points
+    // if (showDebug) {
+    //   push();
+    //   stroke(255, 0,0, 150);
+    //   noFill();
+    //   ellipse(mouseX, mouseY, 15);
+    //   pop();
+    // }
 
     // Save the latest brush values for next frame
     prevBrushSize = brushSize;
@@ -507,4 +524,4 @@ function enableScroll(){
 //     if((yMovement * 3) > xMovement) {
 //         e.preventDefault();
 //     }
-// });
+// })
