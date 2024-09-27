@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-27T13:18:46"
+time_saved =  "Last modified: 2024-09-27T13:47:24"
 
 // Apple Pencil demo using Pressure.js
 
@@ -514,7 +514,6 @@ function initPressure() {
     Pressure.set('#drawingCanvas', {
       
       start: function(event){
-        ua = window.navigator.userAgent;
         // this is called on force start
         if (event.pointerType == 'pen' || !isIpad) {
           isDrawing = true;
@@ -527,7 +526,6 @@ function initPressure() {
         pressure = 0;
   		},
       change: function(force, event) {
-        ua = window.navigator.userAgent;
         if (event.pointerType == 'pen' || !isIpad) {
           if (isPressureInit == false){
             console.log("Pressure.js initialized successfully");
@@ -541,7 +539,7 @@ function initPressure() {
   
     Pressure.config({
       polyfill: true, // use time-based fallback ?
-      polyfillSpeedUp: 1000, // how long does the fallback take to reach full pressure
+      polyfillSpeedUp: 100000000, // how long does the fallback take to reach full pressure
       polyfillSpeedDown: 0,
       preventSelect: true,
       only: null
