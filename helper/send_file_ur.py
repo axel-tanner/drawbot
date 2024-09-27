@@ -43,6 +43,7 @@ def client(lines):
     command = ''.join(lines).encode()
     print(command)
     s.send(command)
+    received_data = s.recv(1024)  # recommended in UR script docs: to read something
 
     s.close()
 
