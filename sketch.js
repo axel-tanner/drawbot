@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-26T16:15:33"
+time_saved =  "Last modified: 2024-09-27T13:18:46"
 
 // Apple Pencil demo using Pressure.js
 
@@ -68,7 +68,8 @@ var isDrawingJustStarted = false;
 const canvasWidth  = 1366;   // ipad 12,9 3rd generation has 1024 × 1366 px
 const canvasHeight = 890;
 const realWidth = 0.4;   // meter
-const realHeight = realWidth / canvasWidth * canvasHeight;  // meter - keeping aspect ratio of canvas ...
+const scaleCanvas2Real = realWidth / canvasWidth;
+const realHeight = scaleCanvas2Real * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.02; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 const zPressureRange = 0.002; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
@@ -332,6 +333,8 @@ function save2file() {
   writer.write("  global approach = 0.03\n");
   // writer.write("  global feature = drawing_plane\n"); /// this does not work remotely
   writer.write("  global feature = p[-0.3,-0.45,0,0,0, -1.57]\n");
+  writer.write(`  global scaler = ${scaleCanvas2Real}\n`);
+  writer.write(`  global zPRange = ${zPressureRange}\n`);
 
   writer.write("  movej([-1.26,-1.19,-2.39,-1.134,1.57,-1.26], rapid_ms, accel_mss, 0, 0)\n");
   writer.write("  stopl(accel_mss)\n");
@@ -345,20 +348,16 @@ function save2file() {
 
     // move to first point with zUp
     pCanvas = pts[0];
-    pReal = convert(pCanvas);
-    writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
+    writer.write(`  movel(pose_trans(feature, p[${round(canvasWidth - pCanvas[0], 3)}*scaler, ${round(pCanvas[1], 3)}*scaler, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
 
     for (let j = 0; j < pts.length; j = j + 1) {
       pCanvas = pts[j];
-      pReal = convert(pCanvas);
-      writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${round(zDown - pReal[2]*zPressureRange, 5)},0,0,0]), accel_mss, v=feed_ms, t=0, r=blend_radius_m)\n`);
+      writer.write(`  movel(pose_trans(feature, p[${round(canvasWidth - pCanvas[0], 3)}*scaler, ${round(pCanvas[1], 3)}*scaler, ${zDown}-${round(pCanvas[2], 4)}*zPRange,0,0,0]), accel_mss, v=feed_ms, t=0, r=blend_radius_m)\n`);
     }
 
     // move to last point with zUp
     pCanvas = pts[pts.length-1];
-    pReal = convert(pCanvas);
-    writer.write(`  movel(pose_trans(feature, p[${pReal[0]}, ${pReal[1]}, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
-
+    writer.write(`  movel(pose_trans(feature, p[${round(canvasWidth - pCanvas[0], 3)}*scaler, ${round(pCanvas[1], 3)}*scaler, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
   }
   // outro
   writer.write("  stopl(accel_mss)\n");
@@ -499,12 +498,12 @@ function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize, rdp=
 *       UTILITIES      *
 ************************/
 
-function convert(p) {
-  prx = round((canvasWidth - p[0]) / canvasWidth * realWidth, 5);
-  pry = round(p[1] / canvasHeight * realHeight, 5);
-  prz = p[2]; // this is the pressure
-  return [prx, pry, prz];
-}
+// function convert(p) {
+//   prx = round((canvasWidth - p[0]) * scaleCanvas2Real, 5);
+//   pry = round(p[1] * scaleCanvas2Real, 5);
+//   prz = p[2]; // this is the pressure
+//   return [prx, pry, prz];
+// }
 
 // Initializing Pressure.js
 // https://pressurejs.com/documentation.html
