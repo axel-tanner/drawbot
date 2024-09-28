@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-27T16:25:02"
+time_saved =  "Last modified: 2024-09-28T13:46:22"
 
 // Apple Pencil demo using Pressure.js
 
@@ -320,6 +320,13 @@ function simplifyPoints(pts = []) {
   return rdpline;
 }
 
+function convert(p) {
+  prx = round(canvasWidth - p[0], 3);
+  pry = round(p[1], 3);
+  prz = round(p[2], 4); // this is the pressure
+  return [prx, pry, prz];
+}
+
 function save2file() {
   print("Saving to file ...");
   let writer = createWriter("drawing.script");
@@ -348,16 +355,17 @@ function save2file() {
 
     // move to first point with zUp
     pCanvas = pts[0];
-    writer.write(`  movel(pose_trans(feature, p[${round(canvasWidth - pCanvas[0], 3)}*scaler, ${round(pCanvas[1], 3)}*scaler, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
+    p = convert(pCanvas);
+    writer.write(`  movel(pose_trans(feature, p[${p[0]}*scaler, ${p[1]}*scaler, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
 
     for (let j = 0; j < pts.length; j = j + 1) {
       pCanvas = pts[j];
-      writer.write(`  movel(pose_trans(feature, p[${round(canvasWidth - pCanvas[0], 3)}*scaler, ${round(pCanvas[1], 3)}*scaler, ${zDown}-${round(pCanvas[2], 4)}*zPRange,0,0,0]), accel_mss, v=feed_ms, t=0, r=blend_radius_m)\n`);
+      writer.write(`  movel(pose_trans(feature, p[${p[0]}*scaler, ${p[1]}*scaler, ${zDown}-${p[2]}*zPRange,0,0,0]), accel_mss, v=feed_ms, t=0, r=blend_radius_m)\n`);
     }
 
     // move to last point with zUp
     pCanvas = pts[pts.length-1];
-    writer.write(`  movel(pose_trans(feature, p[${round(canvasWidth - pCanvas[0], 3)}*scaler, ${round(pCanvas[1], 3)}*scaler, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
+    writer.write(`  movel(pose_trans(feature, p[${p[0]}*scaler, ${p[1]}*scaler, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
   }
   // outro
   writer.write("  stopl(accel_mss)\n");
@@ -497,13 +505,6 @@ function drawLine(prevPenX, prevPenY, prevBrushSize, penX, penY, brushSize, rdp=
 /***********************
 *       UTILITIES      *
 ************************/
-
-// function convert(p) {
-//   prx = round((canvasWidth - p[0]) * scaleCanvas2Real, 5);
-//   pry = round(p[1] * scaleCanvas2Real, 5);
-//   prz = p[2]; // this is the pressure
-//   return [prx, pry, prz];
-// }
 
 // Initializing Pressure.js
 // https://pressurejs.com/documentation.html
