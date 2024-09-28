@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-28T13:46:22"
+time_saved =  "Last modified: 2024-09-28T14:30:16"
 
 // Apple Pencil demo using Pressure.js
 
@@ -67,7 +67,7 @@ var isDrawingJustStarted = false;
 
 const canvasWidth  = 1366;   // ipad 12,9 3rd generation has 1024 × 1366 px
 const canvasHeight = 890;
-const realWidth = 0.4;   // meter
+const realWidth = 0.6;   // meter
 const scaleCanvas2Real = realWidth / canvasWidth;
 const realHeight = scaleCanvas2Real * canvasHeight;  // meter - keeping aspect ratio of canvas ...
 const zUp = 0.015; // meter - height when not drawing
@@ -321,8 +321,13 @@ function simplifyPoints(pts = []) {
 }
 
 function convert(p) {
-  prx = round(canvasWidth - p[0], 3);
-  pry = round(p[1], 3);
+  // // original transformation portrait as seen by robot
+  // prx = round(canvasWidth - p[0], 3);
+  // pry = round(p[1], 3);
+  // landscape as seen from robot
+  prx = round(canvasHeight - p[1], 3);
+  pry = round(canvasWidth - p[0], 3);
+  
   prz = round(p[2], 4); // this is the pressure
   return [prx, pry, prz];
 }
@@ -360,11 +365,13 @@ function save2file() {
 
     for (let j = 0; j < pts.length; j = j + 1) {
       pCanvas = pts[j];
+      p = convert(pCanvas);
       writer.write(`  movel(pose_trans(feature, p[${p[0]}*scaler, ${p[1]}*scaler, ${zDown}-${p[2]}*zPRange,0,0,0]), accel_mss, v=feed_ms, t=0, r=blend_radius_m)\n`);
     }
 
     // move to last point with zUp
     pCanvas = pts[pts.length-1];
+    p = convert(pCanvas);
     writer.write(`  movel(pose_trans(feature, p[${p[0]}*scaler, ${p[1]}*scaler, ${zUp},0,0,0]), accel_mss, v=rapid_ms, t=0, r=blend_radius_m)\n`);
   }
   // outro
