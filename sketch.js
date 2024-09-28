@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-27T13:47:24"
+time_saved =  "Last modified: 2024-09-27T16:25:02"
 
 // Apple Pencil demo using Pressure.js
 
@@ -16,7 +16,7 @@ time_saved =  "Last modified: 2024-09-27T13:47:24"
 // done - implement undo/redo
 // done - tune the epsilon parameter for douglas-peucker ...
 // done - implement minimum distance before new point stored - use douglas-peucker ... use actually these during saving
-// TODO - pressure to z value - test
+// done - pressure to z value - test
 // done - get rid of trailing points when mouse is not pressed anymore -> polyfillSpeedDown value
 // done - why cannot press buttons with pencil? preventSelect? - just accept this
 // done - detect iPad and only take event.pointerType = 'pen'
@@ -26,7 +26,7 @@ time_saved =  "Last modified: 2024-09-27T13:47:24"
 // done - sometimes pressures doesn't seem to release - provoke by moving from outside
 // done - clear button
 // done - stronger effect of brush pressure on screen
-// TODO - do some smoothing?
+// done - do some smoothing?
 // done - test the oneeurofiltering
 
 
@@ -70,7 +70,7 @@ const canvasHeight = 890;
 const realWidth = 0.4;   // meter
 const scaleCanvas2Real = realWidth / canvasWidth;
 const realHeight = scaleCanvas2Real * canvasHeight;  // meter - keeping aspect ratio of canvas ...
-const zUp = 0.02; // meter - height when not drawing
+const zUp = 0.015; // meter - height when not drawing
 const zDown = 0.0; // meter - height when drawing
 const zPressureRange = 0.002; // meter - change in z from 0 to full pressure = 1 (which is hard to reach ... 0.5 is more realistic)
 
