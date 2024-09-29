@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-28T17:11:26"
+time_saved =  "Last modified: 2024-09-29T11:48:08"
 
 // Apple Pencil demo using Pressure.js
 
@@ -67,8 +67,23 @@ var isPressureInit = false;
 var isDrawing = false;
 var isDrawingJustStarted = false;
 
-const canvasWidth  = 1366;   // ipad 12,9 3rd generation has 1024 × 1366 px
-const canvasHeight = 890;
+const canvasWidthIpad  = 1366;   // ipad 12,9 3rd generation has 1024 × 1366 px
+const canvasHeightIpad = 890;
+var height = document.body.clientHeight;
+var width = document.body.clientWidth;
+var canvasHeight;
+var canvasWidth;
+if (width < canvasWidthIpad) {
+  canvasWidth = width;
+} else {
+  canvasWidth = canvasWidthIpad;
+}
+if (height < canvasHeightIpad) {
+  canvasHeight = height - 100;
+} else {
+  canvasHeight = canvasHeightIpad;
+}
+
 const realWidth = 0.6;   // meter
 const scaleCanvas2Real = realWidth / canvasWidth;
 const realHeight = scaleCanvas2Real * canvasHeight;  // meter - keeping aspect ratio of canvas ...
