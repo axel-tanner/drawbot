@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-29T12:10:05"
+time_saved =  "Last modified: 2024-09-29T12:14:29"
 
 // Apple Pencil demo using Pressure.js
 
@@ -95,7 +95,7 @@ const fontSize = '20px';
 
 const epsilon = 0.8;
 
-const isIpad = navigator.maxTouchPoints && navigator.maxTouchPoints > 1;
+const isIpad = navigator.maxTouchPoints && navigator.maxTouchPoints > 1 && navigator.platform == 'MacIntel';
 
 var points = [];
 var strokes = [];
