@@ -1,7 +1,7 @@
 // Starting point https://editor.p5js.org/SableRaf/sketches/PNSk4uR9v
 
 // update handled by 'auto time stamp' extension
-time_saved =  "Last modified: 2024-09-29T12:14:29"
+time_saved =  "Last modified: 2024-09-29T12:18:46"
 
 // Apple Pencil demo using Pressure.js
 
@@ -153,8 +153,8 @@ function setup() {
   buttonRedo.mousePressed(redo);
   buttonRedo.style('font-size', fontSize);
 
-  ts = createElement('div', time_saved.replace('Last modified: ', 'v') + ' ' + navigator.maxTouchPoints + ' ' + navigator.platform);
-  ts.position(20, canvasHeight + 35);
+  ts = createElement('div', time_saved.replace('Last modified: ', 'v') + ' ' + navigator.maxTouchPoints + ' ' + navigator.platform + ' ' + isIpad);
+  ts.position(80, canvasHeight + 35);
   ts.style('font-size', '10pt');
   ts.style('font-family', 'sans-serif');
 
