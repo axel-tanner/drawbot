@@ -41,7 +41,7 @@ def client(lines):
     s.connect((HOST, PORT))
 
     command = ''.join(lines).encode()
-    print(command)
+    # print(command)
     s.send(command)
     received_data = s.recv(1024)  # recommended in UR script docs: to read something
 
