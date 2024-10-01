@@ -4,3 +4,4 @@
 - simple undo/redo functionality per stroke
 - saving creates a file with URScript to drive a Universal Robotics arm
 - helper files are available to sending files through an ethenet connection to the robotic arm
+- can be used by enabling github pages on this repository
